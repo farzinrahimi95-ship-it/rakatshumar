@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes, viewport-fit=cover">
+    <title>رکعت‌شمار هوشمند</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Vazirmatn', 'Vazir', Tahoma, sans-serif;
+            background: #0a2f16;
+            touch-action: manipulation;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: transparent;
+            position: relative;
+        }
+
+        .content-row {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mihrab-full {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 248, 235, 0.08);
+            border: 6px solid #dbb042;
+            border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+            box-shadow: 0 0 70px rgba(218, 165, 32, 0.6), inset 0 0 40px rgba(218, 165, 32, 0.3);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .mihrab-inner {
+            position: absolute;
+            top: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 88%;
+            height: 88%;
+            background: transparent;
+            border: 4px dashed #dbb042;
+            border-radius: 50% 50% 0 0 / 18% 18% 0 0;
+            opacity: 0.4;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .right-panel {
+            width: 15%;
+            min-width: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+            padding: 8px 0;
+        }
+
+        .left-panel {
+            width: 15%;
+            min-width: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+            padding: 8px 0;
+        }
+
+        .column-header-btn {
+            background: #b8860b;
+            border: 2px solid #f5e7d3;
+            border-radius: 12px;
+            padding: 8px 4px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #f9e076;
+            text-align: center;
+            font-family: inherit;
+            white-space: nowrap;
+            width: 90%;
+            user-select: none;
+            cursor: default;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            margin-bottom: 2px;
+        }
+
+        .dua-btn, .surah-btn {
+            background: #f5e7d3;
+            border: 2px solid #b89b5b;
+            border-radius: 10px;
+            padding: 8px 4px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2d4a22;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-family: inherit;
+            white-space: nowrap;
+            width: 90%;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        .dua-btn:active, .surah-btn:active {
+            background: #e4cfae;
+            transform: scale(0.96);
+            border-color: #9e8140;
+        }
+
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 5;
+            height: 100%;
+            padding-bottom: 10px;
+            touch-action: manipulation;
+        }
+
+        .display-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .rakat-title {
+            font-size: clamp(20px, 6vw, 32px);
+            color: #f9e076;
+            text-shadow: 0 2px 8px black;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .rakat-counter-label {
+            font-size: clamp(16px, 4vw, 24px);
+            color: #f9e076;
+            text-shadow: 0 2px 6px black;
+            margin-bottom: 15px;
+            font-weight: bold;
+            min-height: 1.5em;
+        }
+
+        .figures-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            min-height: 100px;
+            width: 100%;
+        }
+
+        .figure {
+            width: clamp(35px, 8vw, 55px);
+            height: clamp(70px, 16vw, 110px);
+        }
+
+        .figure svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+        }
+
+        .mohr-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+            min-height: 36px;
+            align-items: center;
+        }
+
+        .mohr-item {
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle at 30% 30%, #f5e7d3, #c9a85b);
+            border: 2px solid #9b8030;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 -2px 3px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .mohr-item::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #8b6f2c;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        .salavat-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: clamp(18px, 5vw, 30px);
+            color: #ffd966;
+            text-shadow: 0 0 12px #fbbf24, 0 2px 6px black;
+            font-weight: bold;
+            animation: fadeIn 0.6s ease;
+            white-space: nowrap;
+            z-index: 15;
+            display: none;
+            pointer-events: none;
+        }
+
+        .salavat-overlay.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .prayer-bar {
+            height: 70px;
+            background: rgba(10, 30, 15, 0.95);
+            backdrop-filter: blur(8px);
+            border-top: 2px solid #b4944b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            z-index: 30;
+            padding: 0 15px;
+            flex-shrink: 0;
+            margin-bottom: 30px;  /* اضافه شدن این خط */
+        }
+
+        .prayer-btn {
+            background: #f9e7c2;
+            border: 2px solid #b4944b;
+            border-radius: 14px;
+            padding: 8px 14px;
+            font-size: clamp(14px, 3.5vw, 20px);
+            font-weight: bold;
+            color: #2a4b1e;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: 0.2s;
+            font-family: inherit;
+            white-space: nowrap;
+            min-width: 50px;
+            touch-action: manipulation;
+        }
+
+        .prayer-btn.active {
+            background: #ffd966;
+            border-color: #e6a800;
+            box-shadow: 0 0 18px #fbbf24;
+            transform: scale(1.05);
+        }
+
+        .prayer-btn:active {
+            background: #ddc091;
+            transform: scale(0.95);
+        }
+
+        #audioPlayer {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .right-panel, .left-panel {
+                width: 18%;
+                min-width: 55px;
+                gap: 4px;
+            }
+            .dua-btn, .surah-btn, .column-header-btn {
+                font-size: 11px;
+                padding: 6px 2px;
+                border-radius: 8px;
+            }
+            .prayer-bar {
+                height: 60px;
+                gap: 5px;
+            }
+            .prayer-btn {
+                padding: 6px 10px;
+                border-radius: 10px;
+            }
+            .mohr-item {
+                width: 26px;
+                height: 26px;
+            }
+            .salavat-overlay {
+                font-size: clamp(16px, 4.5vw, 26px);
+                bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="content-row">
+            <div class="mihrab-full"></div>
+            <div class="mihrab-inner"></div>
+
+            <div class="right-panel">
+                <div class="column-header-btn">ادعیه</div>
+                <button class="dua-btn" onclick="playAudio('duaAhad')">عهد</button>
+                <button class="dua-btn" onclick="playAudio('duaFaraj')">فرج</button>
+                <button class="dua-btn" onclick="playAudio('duaTawassul')">توسل</button>
+                <button class="dua-btn" onclick="playAudio('duaAlyasin')">آل یاسین</button>
+                <button class="dua-btn" onclick="playAudio('duaAshura')">عاشورا</button>
+                <button class="dua-btn" onclick="playAudio('duaKomeil')">کمیل</button>
+                <button class="dua-btn" onclick="playAudio('duaNodbeh')">ندبه</button>
+            </div>
+
+            <div class="center-panel" id="centerPanel">
+                <div class="display-area">
+                    <div class="rakat-title">رکعت شمار</div>
+                    <div class="rakat-counter-label" id="rakanLabel"></div>
+                    <div class="figures-row" id="figuresRow"></div>
+                    <div class="mohr-row" id="mohrRow"></div>
+                </div>
+            </div>
+
+            <div class="left-panel">
+                <div class="column-header-btn">قرآن</div>
+                <button class="surah-btn" onclick="playAudio('surahWaqiah')">واقعه</button>
+                <button class="surah-btn" onclick="playAudio('surahYasin')">یاسین</button>
+                <button class="surah-btn" onclick="playAudio('surahRahman')">الرحمن</button>
+                <button class="surah-btn" onclick="playAudio('surahFath')">فتح</button>
+                <button class="surah-btn" onclick="playAudio('surahNaba')">نبا</button>
+                <button class="surah-btn" onclick="playAudio('surahNooh')">نوح</button>
+                <button class="surah-btn" onclick="playAudio('surahMolk')">ملک</button>
+            </div>
+
+            <div id="salavatOverlay" class="salavat-overlay">صلوات بر محمد و آل محمد</div>
+        </div>
+
+        <div class="prayer-bar">
+            <button class="prayer-btn" data-prayer="fajr">صبح</button>
+            <button class="prayer-btn active" data-prayer="dhuhr">ظهر</button>
+            <button class="prayer-btn" data-prayer="asr">عصر</button>
+            <button class="prayer-btn" data-prayer="maghrib">مغرب</button>
+            <button class="prayer-btn" data-prayer="isha">عشا</button>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="auto"></audio>
+
+    <script>
+        const stickFigureSVG = `
+            <svg viewBox="0 0 30 60" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="15" cy="10" r="7" stroke="#ffffff" stroke-width="2.5" fill="none" />
+                <line x1="15" y1="17" x2="15" y2="35" stroke="#ffffff" stroke-width="2.5" />
+                <line x1="15" y1="23" x2="5" y2="38" stroke="#ffffff" stroke-width="2.5" />
+                <line x1="15" y1="23" x2="25" y2="38" stroke="#ffffff" stroke-width="2.5" />
+                <line x1="15" y1="35" x2="13" y2="48" stroke="#ffffff" stroke-width="2.5" />
+                <line x1="15" y1="35" x2="17" y2="48" stroke="#ffffff" stroke-width="2.5" />
+            </svg>
+        `;
+
+        const prayers = {
+            fajr: { name: 'صبح', rakats: 2 },
+            dhuhr: { name: 'ظهر', rakats: 4 },
+            asr: { name: 'عصر', rakats: 4 },
+            maghrib: { name: 'مغرب', rakats: 3 },
+            isha: { name: 'عشا', rakats: 4 }
+        };
+
+        const audioFiles = {
+            'audioSalavat': 'salavat.mp3',
+            'duaAhad': 'dua_ahad.mp3',
+            'duaFaraj': 'dua_faraj.mp3',
+            'duaTawassul': 'dua_tawassul.mp3',
+            'duaAlyasin': 'dua_alyasin.mp3',
+            'duaAshura': 'ziarat_ashura.mp3',
+            'duaKomeil': 'dua_komeil.mp3',
+            'duaNodbeh': 'dua_nodbeh.mp3',
+            'surahWaqiah': 'waqiah.mp3',
+            'surahYasin': 'yasin.mp3',
+            'surahRahman': 'rahman.mp3',
+            'surahFath': 'fath.mp3',
+            'surahNaba': 'naba.mp3',
+            'surahNooh': 'nooh.mp3',
+            'surahMolk': 'molk.mp3'
+        };
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        let currentPrayer = 'dhuhr';
+        let totalRakats = prayers[currentPrayer].rakats;
+        let rakatStates = new Array(totalRakats).fill(0);
+        let currentRakat = 0;
+        let shukrDone = false;
+        let lastTouchTime = 0;
+        const TOUCH_COOLDOWN = 400;
+
+        const figuresRow = document.getElementById('figuresRow');
+        const mohrRow = document.getElementById('mohrRow');
+        const salavatOverlay = document.getElementById('salavatOverlay');
+        const rakanLabel = document.getElementById('rakanLabel');
+        const prayerButtons = document.querySelectorAll('.prayer-btn');
+        const centerPanel = document.getElementById('centerPanel');
+
+        function playAudio(id) {
+            const fileName = audioFiles[id];
+            if (fileName && audioPlayer) {
+                audioPlayer.src = fileName;
+                audioPlayer.load();
+                audioPlayer.play().catch(e => console.log('پخش صدا:', e));
+            }
+        }
+
+        function performSajda() {
+            const now = Date.now();
+            if (now - lastTouchTime < TOUCH_COOLDOWN) return;
+            lastTouchTime = now;
+
+            if (shukrDone) return;
+            if (!shukrDone && currentRakat >= totalRakats) {
+                shukrDone = true;
+                playAudio('audioSalavat');
+                updateUI();
+                return;
+            }
+            if (!shukrDone && currentRakat < totalRakats) {
+                if (rakatStates[currentRakat] === 0) {
+                    rakatStates[currentRakat] = 1;
+                } else if (rakatStates[currentRakat] === 1) {
+                    rakatStates[currentRakat] = 2;
+                    currentRakat++;
+                }
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            salavatOverlay.classList.toggle('show', shukrDone);
+            let activeRakat = -1;
+            for (let i = totalRakats - 1; i >= 0; i--) {
+                if (rakatStates[i] > 0) {
+                    activeRakat = i;
+                    break;
+                }
+            }
+            let figuresHtml = '';
+            for (let i = 0; i < totalRakats; i++) {
+                if (rakatStates[i] > 0) {
+                    figuresHtml += `<div class="figure">${stickFigureSVG}</div>`;
+                }
+            }
+            figuresRow.innerHTML = figuresHtml;
+            let mohrHtml = '';
+            if (activeRakat !== -1 && !shukrDone) {
+                const mohrCount = rakatStates[activeRakat];
+                for (let j = 0; j < mohrCount; j++) {
+                    mohrHtml += '<div class="mohr-item"></div>';
+                }
+            }
+            mohrRow.innerHTML = mohrHtml;
+            if (shukrDone) {
+                rakanLabel.textContent = '';
+            } else if (currentRakat >= totalRakats) {
+                rakanLabel.textContent = '';
+            } else if (currentRakat > 0 || rakatStates[0] > 0) {
+                rakanLabel.textContent = `رکعت: ${currentRakat + 1} از ${totalRakats}`;
+            } else {
+                rakanLabel.textContent = '';
+            }
+        }
+
+        function resetState() {
+            if (audioPlayer) {
+                audioPlayer.pause();
+                audioPlayer.src = '';
+            }
+            rakatStates = new Array(totalRakats).fill(0);
+            currentRakat = 0;
+            shukrDone = false;
+            updateUI();
+        }
+
+        function changePrayer(prayerKey) {
+            if (prayerKey === currentPrayer) return;
+            currentPrayer = prayerKey;
+            totalRakats = prayers[prayerKey].rakats;
+            prayerButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.prayer === prayerKey));
+            resetState();
+        }
+
+        centerPanel.addEventListener('touchstart', function(e) {
+            if (e.target.tagName === 'BUTTON') return;
+            e.preventDefault();
+            performSajda();
+        }, { passive: false });
+
+        centerPanel.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') return;
+            performSajda();
+        });
+
+        prayerButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                changePrayer(btn.dataset.prayer);
+            });
+            btn.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                changePrayer(btn.dataset.prayer);
+            });
+        });
+
+        function onProximityNear() {
+            performSajda();
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
