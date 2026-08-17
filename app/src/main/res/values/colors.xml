@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>
+=======
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>
+>>>>>>> 868d7c135aca63b620cc1e1dedae7e68aa955dba
